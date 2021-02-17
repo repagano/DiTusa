@@ -1,5 +1,5 @@
 clear
-% close all
+close all
 clc
  %% Here the files to be loaded are chosen.
 addpath C:\Users\repag\Documents\MATLAB\DiTusa
@@ -21,9 +21,9 @@ filesFFT = filesFFT(I);
 obj = dHvA(loc,temps,files,filesFFT);
 
 %% Here the 1/H windows that are selected and fourier transformed are defined
-endFields = 35;%the endFields are the maximum field values of each window
+endFields = 55;%the endFields are the maximum field values of each window
 
-iFFspan = abs((1/15-1/35));%Here the width of the 1/H window is defined 
+iFFspan = abs((1/15-1/55));%Here the width of the 1/H window is defined 
 % startFields = 15;
 % endFields = 1/(-iFFspan*2+1/startFields)%% Here the Fourier transform is performed  
 
@@ -42,7 +42,39 @@ peakRange = [490 708; 708 850; 850 980; 2600 2900; 3546 3880]; %
 % dHvA.massLoad runs the method that calculates the effective masses.
 dHvA.massLoad(obj,peakRange);
 
-% %% generate data
+
+%%
+leg = []
+figure
+for ii = 1:length(obj.FFT.range(end).upTemp)
+%     figure
+    c = parula(length(obj.FFT.range.upTemp));
+    plot(obj.FFT.range.upTemp(ii).f,obj.FFT.range.upTemp(ii).FFT,'LineWidth',1,'Color',c(ii,:))
+    hold on
+    txt = {strcat(num2str(obj.mass.range.upPeak(1).temp(ii)),' K')}
+    leg = [leg,txt]
+    hold on
+%     pause(1)
+end
+xlabel('Frequency (T)')
+ylabel('Fourier amp. (arb units)')
+legend(leg)
+title('range of 15 to 35 T')
+
+%%
+for ii = 4%1:length(obj.FFT.range.upTemp)
+    figure
+%     plot(1./obj1.FFT.range.upTemp(ii).xspl,obj1.FFT.range.upTemp(ii).yspl,'r','LineWidth',1.1)
+%     hold on
+    s = plot(obj.FFT.range.upTemp(ii).xspl,obj.FFT.range.upTemp(ii).yspl,'b')
+%     s = plot(obj.raw(4).xUp,obj.raw(4).yUp,'b')
+    s.Color(4) = 0.45
+    xlabel('Magnetic field H (T)')
+    ylabel('dM/dH (arb. units)')
+%     legend('Raw','Low-pass filter')
+    title('15 to 55 T, 2.24 K')%, lowpass filter')
+end
+%% generate data
 % 
 % x = 0:.1:10;
 % y = x.*x + randn(size(x));
@@ -92,36 +124,9 @@ end
 xlabel('Frequency (T)')
 ylabel('phase')
 title('phase calc, range 0.049 1/T')
-%%
-for ii = 1:3%1:length(obj.FFT.range.upTemp)
-    figure
-    plot(1./obj1.FFT.range.upTemp(ii).xspl,obj1.FFT.range.upTemp(ii).yspl,'r','LineWidth',1.1)
-    hold on
-    s = plot(1./obj.FFT.range.upTemp(ii).xspl,obj.FFT.range.upTemp(ii).yspl,'b')
-    s.Color(4) = 0.45
-    xlabel('Magnetic field H (T)')
-    ylabel('dM/dH (arb. units)')
-    legend('Raw','Low-pass filter')
-    title('15 to 55 T, 2.24 K, lowpass filter')
-end
 
-%%
-leg = []
-figure
-for ii = 1:length(obj.FFT.range(end).upTemp)
-%     figure
-    c = parula(length(obj.FFT.range.upTemp));
-    plot(obj.FFT.range.upTemp(ii).f,obj.FFT.range.upTemp(ii).FFT,'LineWidth',1,'Color',c(ii,:))
-    hold on
-    txt = {strcat(num2str(obj.mass.range.upPeak(1).temp(ii)),' K')}
-    leg = [leg,txt]
-    hold on
-%     pause(1)
-end
-xlabel('Frequency (T)')
-ylabel('Fourier amp. (arb units)')
-legend(leg)
-title('range of 15 to 35 T')
+
+
 %% phase plot with fixed frequency
 figure 
 leg = [];

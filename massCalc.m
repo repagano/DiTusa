@@ -16,7 +16,7 @@ function [mass] = massCalc(FFTobj,peakRange,pCh)
 %     figure(1)
 %     figure(2)
     for jj = 1:length(FFTobj)
-        chjj = jj
+%         chjj = jj
         f_og = FFTobj(jj).f;   
         fI = f_og>=peakRange(1) & f_og<=peakRange(2);
         f = f_og(fI);

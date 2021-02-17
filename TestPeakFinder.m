@@ -24,7 +24,7 @@ obj = dHvA(loc,temps,files,filesFFT);
 %% Here the 1/H windows that are selected and fourier transformed are defined
 endFields = 35;%the endFields are the maximum field values of each window
 
-iFFspan = abs((1/15-1/30));%Here the width of the 1/H window is defined 
+iFFspan = abs((1/15-1/35));%Here the width of the 1/H window is defined 
 % startFields = 15;
 % endFields = 1/(-iFFspan*2+1/startFields)%% Here the Fourier transform is performed  
 

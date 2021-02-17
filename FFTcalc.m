@@ -57,7 +57,7 @@ function [FFT] = FFTcalc(obj,dataType,FFrange,FFdir,varargin)
     yog = y;
     
     if strcmp(dataType,'dHvA')
-        degree = 2;
+        degree =2;
     elseif strcmp(dataType,'rfPD')
         degree = 2;
     elseif strcmp(dataType,'whatever')
@@ -66,6 +66,10 @@ function [FFT] = FFTcalc(obj,dataType,FFrange,FFdir,varargin)
     yfit = polyfit(xinv,y,degree);
     yfitV = polyval(yfit,xinv);
     
+%     figure
+%     subplot(2,1,1)
+%     plot(xinv,y,'r',xinv,yfitV,'b')
+    
     y = y-yfitV;
     [x,Iuniq] = unique(x);
     y = y(Iuniq);
@@ -73,16 +77,19 @@ function [FFT] = FFTcalc(obj,dataType,FFrange,FFdir,varargin)
     % spline interpolation
     yspl = interp1(x,y,xspl);%CHANGED !!! from spline
     
-%     figure
-%     plot(xspl,yspl,'r',x,y,'.b')
+    Length=abs(xspl(end)-xspl(1));
+    Datapoints = length(yspl);
+    fs=Datapoints/Length;
+%     yspl = lowpass(yspl,10000,fs);
+    yspl = bandpass(yspl,[3500 3900],fs);
+
+%     subplot(2,1,2)
+%     plot(1./xspl,yspl,'r')%,1./x,y,'.b')
 
 %     chyspl1 = yspl(1)
 %     chysplend = yspl(end)
 % 
-%     Length=abs(xspl(end)-xspl(1));
-%     Datapoints = length(yspl1);
-%     fs=Datapoints/Length;
-%     yspl = lowpass(yspl1,2.5e4,fs);
+
      
 %     figure
 %     plot(1./xspl,yspl1,'r')
