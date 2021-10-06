@@ -8,7 +8,7 @@ function [sFile] = saveAoT(obj,path,name)
             
         end
         
-        AoTar(:,1) = [obj.mass.range(ii).upPeak(5).temp];
+        AoTar(:,1) = [obj.mass.range(ii).upPeak(1).temp];
         AoTtab = array2table(AoTar);
         AoTtab.Properties.VariableNames(1) = {'temp'};
         

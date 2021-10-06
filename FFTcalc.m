@@ -11,16 +11,18 @@ function [FFT] = FFTcalc(obj,dataType,FFrange,FFdir,varargin)
    % wether the data is taking from the rising pulse ('up') or falling
    % pulse ('down'). 
 %     obj
+    varargin
     fRange = varargin{1};
     FFdirNum = strcmp(FFdir,'up');
     Tbot = FFrange(1)-1;
     Ttop = FFrange(2)+1;
     chTbot = FFrange(1);
     chTtop = FFrange(2);
+
     switch FFdir
         case 'up'   
-            FF = obj.xUp;
-            xi = obj.yUp;
+            FF = obj.xUp;%Down(end:-1:1);
+            xi = obj.yUp;%Down(end:-1:1);
 %             FF(high:end) = zeros(length(FF(high:end)),1);  
             FFInd = FF >= Tbot & FF <= Ttop;
             xinv = FF(FFInd);
@@ -80,8 +82,20 @@ function [FFT] = FFTcalc(obj,dataType,FFrange,FFdir,varargin)
     Length=abs(xspl(end)-xspl(1));
     Datapoints = length(yspl);
     fs=Datapoints/Length;
-%     yspl = lowpass(yspl,10000,fs);
-    yspl = bandpass(yspl,[3500 3900],fs);
+%     var3fftc = varargin
+
+    figure
+    plot(xspl,yspl)
+    
+    if length(varargin) == 3
+%         varargin3 = varargin{3}
+        switch varargin{2}
+            case 'lowpass' 
+                yspl = lowpass(yspl,varargin{3},fs);%10000
+            case 'bandpass'
+                yspl = bandpass(yspl,varargin{3},fs);%[3500 3900]
+        end
+    end
 
 %     subplot(2,1,2)
 %     plot(1./xspl,yspl,'r')%,1./x,y,'.b')
@@ -94,7 +108,7 @@ function [FFT] = FFTcalc(obj,dataType,FFrange,FFdir,varargin)
 %     figure
 %     plot(1./xspl,yspl1,'r')
 %     pause(.5)
-%     hold on
+%     hold on55
 %     plot(1./xspl,yspl,'b')
 %     temp = strcat(num2str(obj.temp),'K');
 %     title(temp)
@@ -114,8 +128,8 @@ function [FFT] = FFTcalc(obj,dataType,FFrange,FFdir,varargin)
     xfft = linspace(xfft1,xfftEnd,N);%xspl;%
     yfft = [zeros1,ysplW,zerosEnd];%ysplW;%yspl;%
          
-%     figure
-%     plot(x,y,'b',xfft,yfft,'r','LineWidth',1.2)
+    figure
+    plot(x,y,'b',xfft,yfft,'r','LineWidth',1.2)
     
     on = 0;
     if on == 1
@@ -130,7 +144,8 @@ function [FFT] = FFTcalc(obj,dataType,FFrange,FFdir,varargin)
     
     %Calculate fourier transform and define FFT struct 
     Datapoints = length(yfft);
-    FFTc = fft(yfft);%./length(yfft);%fft(yv);%    
+    FFTc = fft(yfft);%./length(yfft);%fft(yv);%   
+    disp(FFTc)
     FFTval = abs(FFTc(1:Datapoints/2+1));
     
 %     figure

@@ -90,8 +90,7 @@ classdef dHvA < handle
         % will Fourier transform data as described above, then rescale the
         % previously calculated FFT to match the arbitrary unites produced
         % by the function FFTcalc. 
-
-            
+            varar = varargin
             fRange = varargin{1}; 
             for jj = 1:length(endFields)
                 % Calculate H range to be fourier transformed 
@@ -99,9 +98,21 @@ classdef dHvA < handle
                 iFFrange = [iendField+iFFspan iendField];
                 FFrange = 1./iFFrange;
                 %Fourier transform range
-                for ii = 1:length(obj.raw)                           
-                    upTemp(ii) = FFTcalc(obj.raw(ii),obj.dataType,...
-                        FFrange,'up',fRange);
+                for ii = 1:length(obj.raw) 
+%                     print(length(varargin))
+                    if length(varargin) == 3
+                        switch varargin{2}
+                            case 'lowpass'
+                                upTemp(ii) = FFTcalc(obj.raw(ii),obj.dataType,...
+                                    FFrange,'up',fRange,'lowpass',varargin{3}); 
+                            case 'bandpass'
+                                upTemp(ii) = FFTcalc(obj.raw(ii),obj.dataType,...
+                                    FFrange,'up',fRange,'bandpass',varargin{3});
+                        end
+                    else
+                        upTemp(ii) = FFTcalc(obj.raw(ii),obj.dataType,...
+                            FFrange,'up',fRan    ge)%,'lowpass',40000);
+                    end
                 end                 
                 obj.FFT.range(jj).upTemp = upTemp;
             end

@@ -21,9 +21,9 @@ obj = dHvA(loc,temps,files,filesFFT);
 %% Here the 1/H windows that are selected and fourier transformed are defined
 % endFields = [15:8:55];%the endFields are the maximum field values of each window
 % clear
-num = 1
-iFFspan = abs((1/25-1/55))/num%Here the width of the 1/H window is defined 
-endFields = [15:1:55]%flip([55:-6:15])%
+% num = 5
+iFFspan = abs((1/35-1/55))%Here the width of the 1/H window is defined 
+endFields = [15:4:55]%flip([55:-6:15])%
 % for jj = 1:length(endFields)
 %     iendField = 1/endFields(jj)
 %     iFFrange(jj,:) = [iendField+iFFspan iendField]
@@ -40,12 +40,29 @@ endFields = [15:1:55]%flip([55:-6:15])%
 % end
 
 %% Here the Fourier transform is performed  
-dHvA.FFTload(obj,endFields,iFFspan,[200 4500]);
+dHvA.FFTload(obj,endFields,iFFspan,[200 4500],'lowpass',10000);
 
-% for ii = 1:length(obj.FFT.range)
-%     cf(ii) = mean(obj.FFT.range(ii).upTemp(1).range);
-% end
-% cf
+%% Plot FFT
+figure
+leg = [];
+range = []
+c = parula(length(obj.FFT.range));%
+c = [0 0 0;c(1:end-1,:)]
+c = pink(length(obj.FFT.range)+3)
+for ii = 1:length(obj.FFT.range)
+    range = [range; obj.FFT.range(ii).upTemp(1).range];
+    cf(ii) = mean(obj.FFT.range(ii).upTemp(1).range);
+    leg = [leg,{strcat(num2str(1/cf(ii)),' 1/T')}];
+    plot(obj.FFT.range(ii).upTemp(2).f,obj.FFT.range(ii).upTemp(2).FFT,...
+        'LineWidth',1.2,'Color',c(ii,:))
+    hold on
+end
+leg = legend(leg)
+
+title(leg,'1/B_m')
+xlabel('Frequency (T)')
+ylabel('Fourier amp. (arb. units)')
+title('range 0.002 1/T range, interval 15:8:55')
 
 
 %% Here the effective masses of the different peaks are calculated 
@@ -66,7 +83,8 @@ close all
 for ii = 1:length(obj.FFT.range)
     leg = [];
     figure
-   for jj = 1:length(obj.FFT.range(1).upTemp)         
+   for jj = 1:length(obj.FFT.range(1).upTemp)  
+       
         plot(obj.FFT.range(ii).upTemp(jj).f,obj.FFT.range(ii).upTemp(jj).FFT)
         hold on
         leg = [leg,{strcat(num2str(obj.FFT.range(ii).upTemp(jj).temp),' K')}];

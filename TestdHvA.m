@@ -18,61 +18,93 @@ files = files(I);
 filesFFT = filesFFT(I);
 
 %% Here the raw data is loaded into dHvA class
-obj = dHvA(loc,temps,files,filesFFT);
+obj1 = dHvA(loc,temps,files,filesFFT);
 
 %% Here the 1/H windows that are selected and fourier transformed are defined
-endFields = 55;%the endFields are the maximum field values of each window
+endFields = 35;%the endFields are the maximum field values of each window
 
-iFFspan = abs((1/15-1/55));%Here the width of the 1/H window is defined 
+iFFspan = abs((1/15-1/35));%Here the width of the 1/H window is defined 
 % startFields = 15;
 % endFields = 1/(-iFFspan*2+1/startFields)%% Here the Fourier transform is performed  
 
-dHvA.FFTload(obj,endFields,iFFspan,[200 5e3],'extFFT');
+dHvA.FFTload(obj1,endFields,iFFspan,[200 5e3],'extFFT');%7e4],'extFFT')%
 
 
+%%
+% % T = csvread('C:\Users\repag\Documents\MATLAB\Manuscript 21 data\dMdH.csv')%array2table([1./obj.FFT.range.upTemp(4).xspl',obj.FFT.range.upTemp(4).yspl']);
+% tv = [table2array(T),obj.FFT.range.upTemp(4).yspl'];
+% figure
+% plot(tv(:,1),tv(:,2),tv(:,1),tv(:,3))
+% T = array2table(tv)
+% T.Properties.VariableNames = [{'H'},{'dM/dH no filter'},{'dM/dH 10000 filter'}]
+% writetable(T,'C:\Users\repag\Documents\MATLAB\Manuscript 21 data\dMdH.csv','Delimiter',',','QuoteStrings',true)
 %% Here the effective masses of the different peaks are calculated 
+
+
 % peakRange is an matrix whose rows define the range around each peak 
 % identified on the Fourier spectrum. The columns correspond to different
 % peaks. The range should be large enough to allow for variation in the position 
 % of the peak as the different ranges and temperatures are scanned over, but 
 % not be so large that another peak is selected. 
 
-peakRange = [490 708; 708 850; 850 980; 2600 2900; 3546 3880]; %
+peakRange =  [2666, 2858; 3232, 3316; 3317.5, 3392.5; 3615, 3823];% 15to55% [2666, 2858; 3194, 3400; 3558, 3875];% 15to35%
 % peakRange
 % dHvA.massLoad runs the method that calculates the effective masses.
 dHvA.massLoad(obj,peakRange);
 
+%%
+
+for ii = 1:length(obj.mass.range.upPeak)
+    figure
+    plot(obj.mass.range.upPeak(ii).temp,obj.mass.range.upPeak(ii).AoT)
+end
 
 %%
+for ii = 1:length(obj.raw)
+    figure 
+    plot(obj.raw(ii).xUp,obj.raw(ii).yUp,'r')
+    hold on
+    plot(obj.raw(ii).xDown,obj.raw(ii).yDown,'b')
+end
+
+%%
+tv = obj.FFT.range.upTemp(1).f';
 leg = []
 figure
-for ii = 1:length(obj.FFT.range(end).upTemp)
+for ii = 1:length(obj.FFT.range(end).upTemp)%4%
 %     figure
     c = parula(length(obj.FFT.range.upTemp));
     plot(obj.FFT.range.upTemp(ii).f,obj.FFT.range.upTemp(ii).FFT,'LineWidth',1,'Color',c(ii,:))
     hold on
-    txt = {strcat(num2str(obj.mass.range.upPeak(1).temp(ii)),' K')}
-    leg = [leg,txt]
+    txt = {strcat(num2str(obj.FFT.range.upTemp(ii).temp),' K')};
+    leg = [leg,txt];
     hold on
-%     pause(1)
+    pause(1)
+    
+    tv(:,ii+1) = obj.FFT.range.upTemp(ii).FFT';
 end
 xlabel('Frequency (T)')
 ylabel('Fourier amp. (arb units)')
 legend(leg)
-title('range of 15 to 35 T')
-
+title('range of 15 to 35 T, rising field')
 %%
-for ii = 4%1:length(obj.FFT.range.upTemp)
+T = array2table(tv)
+T.Properties.VariableNames(1) = {'Frequency (T)'};
+T.Properties.VariableNames(2:end) = leg
+writetable(T,'C:\Users\repag\Documents\MATLAB\Manuscript 21 data\FFT_15to35.csv','Delimiter',',','QuoteStrings',true)
+%%
+for ii = 1:length(obj.FFT.range.upTemp)
     figure
 %     plot(1./obj1.FFT.range.upTemp(ii).xspl,obj1.FFT.range.upTemp(ii).yspl,'r','LineWidth',1.1)
 %     hold on
     s = plot(obj.FFT.range.upTemp(ii).xspl,obj.FFT.range.upTemp(ii).yspl,'b')
 %     s = plot(obj.raw(4).xUp,obj.raw(4).yUp,'b')
     s.Color(4) = 0.45
-    xlabel('Magnetic field H (T)')
+    xlabel('Magnetic field 1/H (T)')
     ylabel('dM/dH (arb. units)')
 %     legend('Raw','Low-pass filter')
     title('15 to 55 T, 2.24 K')%, lowpass filter')
+    pause(1)
 end
 %% generate data
 % 

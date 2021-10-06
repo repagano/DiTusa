@@ -44,11 +44,11 @@ plot(obj.FFT.range.upTemp(5).f(1:end),obj.FFT.range.upTemp(5).FFT(1:end))
 legend('0.62 K','0.96 K', '1.52 K','2.24 K','3.27 K')
 % ylim([0 50])
 %%
-for ii = 2:length(x1)
-%     chy1 = x1(ii-1)
-%     chy2 = x1(ii)
-    dif = (x1(ii-1)-x1(ii))
-end
+% for ii = 2:length(x1)
+% %     chy1 = x1(ii-1)
+% %     chy2 = x1(ii)
+%     dif = (x1(ii-1)-x1(ii))
+% end
 
 %%
 clear ii pp0 ii L FFT f pointNum0
@@ -211,7 +211,13 @@ peakRange1 = [peakRange(1:5,:);3066 3165; 3252 3321; 3322 3381;peakRange(6:end,:
 legend(leg)
 %%
 dHvA.massLoad(obj,peakRange(1:end,:));
-
+%%
+for ii = 1:length(obj.mass.range.upPeak)
+    mfcc_mean(ii) = mean(obj.mass.range.upPeak(ii).maxFreq);
+    mfcc_std(ii) = std(obj.mass.range.upPeak(ii).maxFreq);
+end
+mfcc_mean
+mfcc_std
 %%
 clc  
 saveAoT(obj,'C:\Users\repag\Documents\MATLAB\AoTvals\AoTrng15to35\','full15to35')

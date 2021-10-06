@@ -1,3 +1,4 @@
+
 clear
 close all
 clc
@@ -21,11 +22,11 @@ files = files(logical([0, 0 , I]));
 obj = dHvA(loc,temps,files);
 
 %% Here the 1/H windows that are selected and fourier transformed are defined
-endFields = [20:60];%the endFields are the maximum field values of each window
-iFFspan = abs((1/22-1/60));%Here the width of the 1/H window is defined 
+endField = 60;%the endFields are the maximum field values of each window
+iFFspan = abs((1/10-1/60));%Here the width of the 1/H window is defined 
 
 %% Here the Fourier transform is performed  
-dHvA.FFTload(obj,[22,60],iFFspan,[5 1000]);
+dHvA.FFTload(obj,endField,iFFspan,[5 1000]);
 
 %% Here the effective masses of the different peaks are calculated 
 % peakRange is an matrix whose rows define the range aro und each peak 
