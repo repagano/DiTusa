@@ -62,7 +62,7 @@ classdef dHvA < handle
                     dataType = 'dHvA';
                 elseif contains(name,'.dat')
                     % Load rfPD data
-                    raw(ii) = PenetrationDepthLoad(sortedTemp(ii),file);
+                    raw(ii) = YuLoad(sortedTemp(ii),file);%PenetrationDepthLoad
                     dataType = 'rfPD';
                 else
                     error('Inappropriate inputs to function')
@@ -90,7 +90,7 @@ classdef dHvA < handle
         % will Fourier transform data as described above, then rescale the
         % previously calculated FFT to match the arbitrary unites produced
         % by the function FFTcalc. 
-            varar = varargin
+
             fRange = varargin{1}; 
             for jj = 1:length(endFields)
                 % Calculate H range to be fourier transformed 
@@ -99,6 +99,7 @@ classdef dHvA < handle
                 FFrange = 1./iFFrange;
                 %Fourier transform range
                 for ii = 1:length(obj.raw) 
+                    disp(ii)
 %                     print(length(varargin))
                     if length(varargin) == 3
                         switch varargin{2}
@@ -111,21 +112,21 @@ classdef dHvA < handle
                         end
                     else
                         upTemp(ii) = FFTcalc(obj.raw(ii),obj.dataType,...
-                            FFrange,'up',fRan    ge)%,'lowpass',40000);
+                            FFrange,'up',fRange);%,'lowpass',40000);
                     end
                 end                 
                 obj.FFT.range(jj).upTemp = upTemp;
             end
             
 %           % recale previously calculated Fourier transform
-            if length(varargin) == 2
-                for kk = 1:length(obj.raw)
-                    fraw = obj.raw(kk).f;
-                    frawI = fraw>=fRange(1) & fraw<=fRange(2);
-                    obj.raw(kk).f = fraw(frawI);
-                    obj.raw(kk).FFT = obj.raw(kk).FFT(frawI).*9.67e6;%.*8.2e7;
-                end
-            end  
+%             if length(varargin) == 2
+%                 for kk = 1:length(obj.raw)
+%                     fraw = obj.raw(kk).f;
+%                     frawI = fraw>=fRange(1) & fraw<=fRange(2);
+%                     obj.raw(kk).f = fraw(frawI);
+%                     obj.raw(kk).FFT = obj.raw(kk).FFT(frawI).*9.67e6;%.*8.2e7;
+%                 end
+%             end  
         end 
 %%
         function massLoad(obj,peakRange)

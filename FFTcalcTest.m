@@ -94,7 +94,7 @@ function [FFT] = FFTcalcTest(obj,dataType,FFrange,FFdir,varargin)
     Datapoints = length(yfft);
     Length=abs(xfft(end)-xfft(1));
 
-    FFTc = fft(yfft);%./length(yfft);
+    FFTc = fft(yfft)%./length(yfft);
     FFTphase = angle(FFTc);
     FFTphaseVal = FFTphase(1:Datapoints/2+1);
     FFTval = abs(FFTc(1:Datapoints/2+1));

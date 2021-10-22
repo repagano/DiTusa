@@ -18,7 +18,7 @@ files = files(I);
 filesFFT = filesFFT(I);
 
 %% Here the raw data is loaded into dHvA class
-obj1 = dHvA(loc,temps,files,filesFFT);
+obj = dHvA(loc,temps,files,filesFFT);
 
 %% Here the 1/H windows that are selected and fourier transformed are defined
 endFields = 35;%the endFields are the maximum field values of each window
@@ -27,7 +27,7 @@ iFFspan = abs((1/15-1/35));%Here the width of the 1/H window is defined
 % startFields = 15;
 % endFields = 1/(-iFFspan*2+1/startFields)%% Here the Fourier transform is performed  
 
-dHvA.FFTload(obj1,endFields,iFFspan,[200 5e3],'extFFT');%7e4],'extFFT')%
+dHvA.FFTload(obj,endFields,iFFspan,[200 5e3],'extFFT');%7e4],'extFFT')%
 
 
 %%

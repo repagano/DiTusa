@@ -11,45 +11,47 @@ function [FFT] = FFTcalc(obj,dataType,FFrange,FFdir,varargin)
    % wether the data is taking from the rising pulse ('up') or falling
    % pulse ('down'). 
 %     obj
-    varargin
+    
     fRange = varargin{1};
     FFdirNum = strcmp(FFdir,'up');
-    Tbot = FFrange(1)-1;
-    Ttop = FFrange(2)+1;
+    Tbot = FFrange(1)-1
+    Ttop = FFrange(2)+1
     chTbot = FFrange(1);
     chTtop = FFrange(2);
 
-    switch FFdir
-        case 'up'   
-            FF = obj.xUp;%Down(end:-1:1);
-            xi = obj.yUp;%Down(end:-1:1);
+%     switch FFdir
+%         case 'up'   
+    FF = obj.xDown;%Down(end:-1:1);
+    xi = obj.yDown;%Down(end:-1:1);
 %             FF(high:end) = zeros(length(FF(high:end)),1);  
-            FFInd = FF >= Tbot & FF <= Ttop;
-            xinv = FF(FFInd);
+    FFInd = FF >= Tbot & FF <= Ttop;
+%     disp
+    xinv = FF(FFInd);
 %             int = .0000001;%change to the power of 8
-            x = 1./xinv;%
-            N = 2^20;%round(abs(x(1)-x(end))/int); %Total number of points of array fed into FFT 
-            
-            if rem(N,2) == 1
-                N = N+1;
-            end
-            
-        case 'down'
-            FF = obj.xDown;
-            xi = obj.yDown;
-            FF(1:high) = zeros(high,1);
-            FFInd = FF >= Tbot & FF <= Ttop;
-            xinv = FF(FFInd);
-            int = .0000001;
-            x = 1./xinv;
-            if rem(N,2) == 1
-                N = N+1;
-            end
-%             chN = N
-            xspl = linspace(x(end),x(1),N);
+    x = 1./xinv;%
+    N = 2^20;%round(abs(x(1)-x(end))/int); %Total number of points of array fed into FFT 
+
+    if rem(N,2) == 1
+        N = N+1;
     end
+            
+%         case 'down'
+%             FF = obj.xDown;
+%             xi = obj.yDown;
+%             FF(1:high) = zeros(high,1);
+%             FFInd = FF >= Tbot & FF <= Ttop;
+%             xinv = FF(FFInd);
+%             int = .0000001;
+%             x = 1./xinv;
+%             if rem(N,2) == 1
+%                 N = N+1;
+%             end
+% %             chN = N
+%             xspl = linspace(x(end),x(1),N);
+%     end
 
     n = 2^15 ; %round(N*2/3); %number of points fit to the spline %;
+    
     xspl = linspace(1/chTtop,1/chTbot,n); %
 %     chx = []
 %     chorig = [x(end),x(1)]
@@ -61,7 +63,8 @@ function [FFT] = FFTcalc(obj,dataType,FFrange,FFdir,varargin)
     if strcmp(dataType,'dHvA')
         degree =2;
     elseif strcmp(dataType,'rfPD')
-        degree = 2;
+        disp('rfPD')
+        degree = 4;
     elseif strcmp(dataType,'whatever')
         degree = 0;
     end
@@ -77,15 +80,19 @@ function [FFT] = FFTcalc(obj,dataType,FFrange,FFdir,varargin)
     y = y(Iuniq);
     
     % spline interpolation
-    yspl = interp1(x,y,xspl);%CHANGED !!! from spline
+    yspl = interp1(x,y,xspl);%CHANGED !!! from splin
+    
+    I = ~isnan(yspl);
+    if any(I == false)
+        yspl = yspl(I);
+        xspl = xspl(I);
+    end
+        
     
     Length=abs(xspl(end)-xspl(1));
     Datapoints = length(yspl);
     fs=Datapoints/Length;
 %     var3fftc = varargin
-
-    figure
-    plot(xspl,yspl)
     
     if length(varargin) == 3
 %         varargin3 = varargin{3}
@@ -119,17 +126,17 @@ function [FFT] = FFTcalc(obj,dataType,FFrange,FFdir,varargin)
     ysplW = yspl.*hwind;
     
     %Zeri pading
-    nZero = (N-n)/2;
+   
+    nZero = (N-n)/2
     xfft1 = xspl(1)-floor(nZero)*int;
     xfftEnd = xspl(end)+ceil(nZero)*int;   
     zeros1 = zeros(1,floor(nZero));
     zerosEnd = zeros(1,ceil(nZero));
         
     xfft = linspace(xfft1,xfftEnd,N);%xspl;%
-    yfft = [zeros1,ysplW,zerosEnd];%ysplW;%yspl;%
-         
-    figure
-    plot(x,y,'b',xfft,yfft,'r','LineWidth',1.2)
+    yfft = [zeros1,ysplW,zerosEnd];%yspl;%ysplW;%
+%     figure
+%     plot(x,y,'b',xfft,yfft,'r','LineWidth',1.2)
     
     on = 0;
     if on == 1
@@ -143,11 +150,11 @@ function [FFT] = FFTcalc(obj,dataType,FFrange,FFdir,varargin)
     end
     
     %Calculate fourier transform and define FFT struct 
-    Datapoints = length(yfft);
+    Datapoints = length(yfft)
     FFTc = fft(yfft);%./length(yfft);%fft(yv);%   
-    disp(FFTc)
+%     disp(FFTc)
     FFTval = abs(FFTc(1:Datapoints/2+1));
-    
+    disp('check')
 %     figure
 %     plot(yfft)
     
@@ -169,6 +176,6 @@ function [FFT] = FFTcalc(obj,dataType,FFrange,FFdir,varargin)
     FFT.FFT = FFTval(fI);
     FFT.phase = FFTphaseVal(fI);
     FFT.temp = obj.temp;
-    FFT.range = FFrange;
+    FFT.range = FFrange;  
 
 end
