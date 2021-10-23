@@ -21,8 +21,8 @@ function [FFT] = FFTcalc(obj,dataType,FFrange,FFdir,varargin)
 
 %     switch FFdir
 %         case 'up'   
-    FF = obj.xDown;%Down(end:-1:1);
-    xi = obj.yDown;%Down(end:-1:1);
+    FF = obj.xDown;%Up;%Down;%
+    xi = obj.yDown;%Up;%Down;
 %             FF(high:end) = zeros(length(FF(high:end)),1);  
     FFInd = FF >= Tbot & FF <= Ttop;
 %     disp
@@ -63,7 +63,7 @@ function [FFT] = FFTcalc(obj,dataType,FFrange,FFdir,varargin)
     if strcmp(dataType,'dHvA')
         degree =2;
     elseif strcmp(dataType,'rfPD')
-        disp('rfPD')
+%         disp('rfPD'R)
         degree = 4;
     elseif strcmp(dataType,'whatever')
         degree = 0;
