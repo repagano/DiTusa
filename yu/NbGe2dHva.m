@@ -1,4 +1,4 @@
- close all
+close all
 clear
 clc
 
@@ -19,9 +19,10 @@ obj = dHvA(loc,temps,files);
 %% Here the 1/H windows that are selected and fourier transformed are defined
 clc
 close all
+field1 = 20;
 endFields = 60;%the endFields are the maximum field values of each window
 
-iFFspan = abs((1/40-1/60));%Here the width of the 1/H window is defined 
+iFFspan = abs((1/field1-1/endFields));%Here the width of the 1/H window is defined 
 % startFields = 15;
 % endFields = 1/(-iFFspan*2+1/startFields)%% Here the Fourier transform is performed  
 
@@ -34,6 +35,57 @@ dHvA.FFTload(obj,endFields,iFFspan,[10 5e3],'extFFT');%7e4],'extFFT')%
 %     ylabel('Frequency after bs')
 %     title('p007_012221P001.dat')
 % end
+
+%%
+peakRangeDownH =  [350, 450; 550, 670; 770, 865; 2140, 2220; 3470, 3560; 3800, 3930; 4340, 4440]; %HFT, 20 to 60 T, falling field% [4340, 4440];%
+peakRangeUpH = [160, 240; 350, 460; 560, 620; 770, 875]; %HFT, 20 to 60 T, rising field
+peakRangeDownP = [500, 620];
+
+% 15to55% [2666, 2858; 3194, 3400; 3558, 3875];% 15to35%
+% peakRange
+% dHvA.massLoad runs the method that calculates the effective masses.
+dHvA.massLoad(obj,peakRangeDownP);
+
+%%
+figure
+plot(obj.mass.range.upPeak.temp,obj.mass.range.upPeak.AoT,'*',...
+    obj.mass.range.upPeak.temp,obj.mass.range.upPeak.AoTfitV)
+%%
+tv = obj.FFT.range.upTemp(1).f';
+leg = []
+figure
+for ii = 1:length(obj.FFT.range(end).upTemp)%4%
+%     figure
+%     for jj = 1:length(obj.mass.range.upPeak)
+%         peakA(jj) = obj.mass.range.upPeak(jj).A(ii)
+%         peakF(jj) = obj.mass.range.upPeak(jj).maxFreq(ii)
+%         chjj = jj
+%     end
+    c = parula(length(obj.FFT.range.upTemp));
+    plot(obj.FFT.range.upTemp(ii).f,obj.FFT.range.upTemp(ii).FFT,'LineWidth',1)%,'Color',c(ii,:)
+    hold on
+%     plot(peakF,peakA,'*')
+    txt = {strcat(num2str(obj.FFT.range.upTemp(ii).temp),' K')};
+    txtpeak = {strcat(num2str(obj.FFT.range.upTemp(ii).temp),' K peak')};
+    leg = [leg,txt,txtpeak];
+end
+xlabel('Frequency (T)')
+ylabel('Fourier amp. (arb units)')
+legend(leg)
+title('P sample, range of 40 to 60 T, falling field')
+%%
+for ii = 1:length(obj.mass.range.upPeak)
+    
+    figure
+    subplot(1,2,1)
+    plot(obj.mass.range.upPeak(ii).temp,obj.mass.range.upPeak(ii).A,'*')
+    subplot(1,2,2)
+    plot(obj.mass.range.upPeak(ii).temp,obj.mass.range.upPeak(ii).AoT,'*')
+    hold on
+    plot(obj.mass.range.upPeak(ii).temp,obj.mass.range.upPeak(ii).AoTfitV)
+    tv = mean(obj.mass.range.upPeak(ii).maxFreq);
+    suptitle(sprintf('max peak,  %0.1f T', tv))
+end
 %%
 % for ii = 2%1:length(obj.FFT.range.upTemp)
 %     figure
@@ -53,25 +105,7 @@ dHvA.FFTload(obj,endFields,iFFspan,[10 5e3],'extFFT');%7e4],'extFFT')%
 % 
 % end
 %%
-tv = obj.FFT.range.upTemp(1).f';
-leg = []
-figure
-for ii = 1:length(obj.FFT.range(end).upTemp)%4%
-%     figure
-    c = parula(length(obj.FFT.range.upTemp));
-    plot(obj.FFT.range.upTemp(ii).f,obj.FFT.range.upTemp(ii).FFT,'LineWidth',1)%,'Color',c(ii,:)
-    hold on
-    txt = {strcat(num2str(obj.FFT.range.upTemp(ii).temp),' K')};
-    leg = [leg,txt];
-    hold on
-%     pause(1)
-    
-%     tv(:,ii+1) = obj.FFT.range.upTemp(ii).FFT';
-end
-xlabel('Frequency (T)')
-ylabel('Fourier amp. (arb units)')
-legend(leg)
-title('P sample, range of 40 to 60 T, falling field')
+
 % ylim([0 1.6e6])
 
 %label for P up

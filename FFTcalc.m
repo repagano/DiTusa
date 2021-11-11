@@ -14,15 +14,15 @@ function [FFT] = FFTcalc(obj,dataType,FFrange,FFdir,varargin)
     
     fRange = varargin{1};
     FFdirNum = strcmp(FFdir,'up');
-    Tbot = FFrange(1)-1
-    Ttop = FFrange(2)+1
+    Tbot = FFrange(1)-1;
+    Ttop = FFrange(2)+1;
     chTbot = FFrange(1);
     chTtop = FFrange(2);
 
 %     switch FFdir
 %         case 'up'   
-    FF = obj.xDown;%Up;%Down;%
-    xi = obj.yDown;%Up;%Down;
+    FF = obj.xDown;%Up;%
+    xi = obj.yDown;%Up;%
 %             FF(high:end) = zeros(length(FF(high:end)),1);  
     FFInd = FF >= Tbot & FF <= Ttop;
 %     disp
@@ -30,10 +30,6 @@ function [FFT] = FFTcalc(obj,dataType,FFrange,FFdir,varargin)
 %             int = .0000001;%change to the power of 8
     x = 1./xinv;%
     N = 2^20;%round(abs(x(1)-x(end))/int); %Total number of points of array fed into FFT 
-
-    if rem(N,2) == 1
-        N = N+1;
-    end
             
 %         case 'down'
 %             FF = obj.xDown;
@@ -51,13 +47,25 @@ function [FFT] = FFTcalc(obj,dataType,FFrange,FFdir,varargin)
 %     end
 
     n = 2^15 ; %round(N*2/3); %number of points fit to the spline %;
-    
     xspl = linspace(1/chTtop,1/chTbot,n); %
+%     Ix = ~isnan(xspl);
+%     if any(Ix == false)
+%         disp('NAN in xspl')
+%     end
 %     chx = []
 %     chorig = [x(end),x(1)]
 %     chch = [1/chTtop,1/chTbot]
     int = xspl(2)-xspl(1);
     y = xi(FFInd);
+    I = ~isnan(y);
+%     if any(I == false)
+%         disp('NAN in y raw data')
+%         nminus = length(I==false)
+%         y = y(I);
+%         x = x(I);
+%         xinv = xinv(I);
+%     end
+    
     yog = y;
     
     if strcmp(dataType,'dHvA')
@@ -81,25 +89,26 @@ function [FFT] = FFTcalc(obj,dataType,FFrange,FFdir,varargin)
     
     % spline interpolation
     yspl = interp1(x,y,xspl);%CHANGED !!! from splin
-    
     I = ~isnan(yspl);
     if any(I == false)
+        disp('NAN from spline fit')
         yspl = yspl(I);
         xspl = xspl(I);
-    end
-        
+    end        
     
     Length=abs(xspl(end)-xspl(1));
     Datapoints = length(yspl);
     fs=Datapoints/Length;
 %     var3fftc = varargin
     
-    if length(varargin) == 3
+    if length(varargin) == 3        
 %         varargin3 = varargin{3}
         switch varargin{2}
             case 'lowpass' 
+                disp('lowpass filtered')
                 yspl = lowpass(yspl,varargin{3},fs);%10000
             case 'bandpass'
+                disp('bandpass filtered')
                 yspl = bandpass(yspl,varargin{3},fs);%[3500 3900]
         end
     end
@@ -124,17 +133,30 @@ function [FFT] = FFTcalc(obj,dataType,FFrange,FFdir,varargin)
     Datapoints = length(yspl);
     hwind = hann(Datapoints)';
     ysplW = yspl.*hwind;
+    I4 = ~isnan(ysplW);
+    if any(I4 == false)
+        disp('NAN in yfitV')
+    end
     
     %Zeri pading
    
-    nZero = (N-n)/2
+    nZero = (N-n)/2;
     xfft1 = xspl(1)-floor(nZero)*int;
     xfftEnd = xspl(end)+ceil(nZero)*int;   
     zeros1 = zeros(1,floor(nZero));
+%     check01 = length(zeros1)
     zerosEnd = zeros(1,ceil(nZero));
+%     checkZeroEnd = length(zerosEnd)
+%     checkYW = length(ysplW)
         
     xfft = linspace(xfft1,xfftEnd,N);%xspl;%
     yfft = [zeros1,ysplW,zerosEnd];%yspl;%ysplW;%
+%     I2 = ~isnan(yfft);
+%     chyvs = find(yfft,NaN)
+%     chxfft = length(xfft)
+%     chyfft = length(yfft)
+    
+%     chN = N
 %     figure
 %     plot(x,y,'b',xfft,yfft,'r','LineWidth',1.2)
     
@@ -150,11 +172,10 @@ function [FFT] = FFTcalc(obj,dataType,FFrange,FFdir,varargin)
     end
     
     %Calculate fourier transform and define FFT struct 
-    Datapoints = length(yfft)
+    Datapoints = length(yfft);
     FFTc = fft(yfft);%./length(yfft);%fft(yv);%   
 %     disp(FFTc)
     FFTval = abs(FFTc(1:Datapoints/2+1));
-    disp('check')
 %     figure
 %     plot(yfft)
     

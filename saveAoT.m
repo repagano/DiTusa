@@ -19,7 +19,7 @@ function [sFile] = saveAoT(obj,path,name)
         masstab = array2table(massarray)
         masstab.Properties.VariableNames(2) = {'maxFreq'};
         masstab.Properties.VariableNames(1) = {'massMatlabCalc'};
-        masstab
+%         masstab
         
         sFile2 = sprintf('%sMaxFreq_MATLABmass%s.csv',path,name)
         writetable(masstab,sFile2,'Delimiter',',','QuoteStrings',true)%'AoTfull15to35.csv'

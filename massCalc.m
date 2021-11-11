@@ -58,13 +58,13 @@ function [mass] = massCalc(FFTobj,peakRange,pCh)
     AoT = A./temp;
 %     Weights = A.*.1./temp;
     
-    %Fit AoT vs T data to dHvA mass equation 
+    %Fit AoT vs T data to dHvA mass equation
     Bm = 1/(1/2*(1/Brange(1)+1/Brange(end)));
-    AoTfittype = fittype(@(a,b,c,x) a./sinh(b*x)+c);%fittype(@(a,b,x) (a.*14.69*b/Bm)./sinh(14.69*b*x./Bm));
+    AoTfittype = fittype(@(a,b,x) a./sinh(b*x));%fittype(@(a,b,c,x) a./sinh(b*x)+c);%fittype(@(a,b,x) (a.*14.69*b/Bm)./sinh(14.69*b*x./Bm));
     AoTfitopt = fitoptions(AoTfittype);
-    AoTfitopt.startpoint = [3.3 .29 0];
+    AoTfitopt.startpoint = [2,10];%[3.3 .29 0];
 %     Weights = 
-    AoTfitopt.Weights = 1./(weight);%[.62 .96 1.52 2.24 3.27 3.96 5.71 8 10 12 14 18]./18;%ones(1,length(temp));%
+%     AoTfitopt.Weights = 1./(weight);%[.62 .96 1.52 2.24 3.27 3.96 5.71 8 10 12 14 18]./18;%ones(1,length(temp));%
 %     AoTfittype = fittype(a*asinh(x*b),'coefficients',{'a','b'})
     bUpper = 3*14.69/Bm;
     [AoTfit, ~] = fit(temp,AoT,AoTfittype,AoTfitopt);%,'StartPoint',[0 .07]
